@@ -26,11 +26,21 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
-            cd /var/www/ads-analitika
-            git config --global --add safe.directory /var/www/ads-analitika || true
+            APP_DIR=/var/www/ads-analitika
+            cd "$APP_DIR"
+            git config --global --add safe.directory "$APP_DIR" || true
             git remote set-url origin https://github.com/Abdulhaqdev/ads-analitika.git
             git fetch --prune origin main
-            git checkout -B main origin/main
+            # Drop conflicting untracked files, keep runtime data
+            git clean -fd \
+              -e .env \
+              -e database/database.sqlite \
+              -e vendor \
+              -e node_modules \
+              -e public/build \
+              -e public/storage \
+              -e storage
+            git checkout -f -B main origin/main
             git reset --hard origin/main
             chmod +x deploy/deploy.sh
             bash deploy/deploy.sh

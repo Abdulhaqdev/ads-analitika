@@ -7,9 +7,6 @@ COMPOSER="${COMPOSER_BIN:-/usr/local/bin/composer}"
 
 cd "$APP_DIR"
 
-echo "==> Maintenance mode"
-$PHP artisan down --retry=30 --secret="deploy-bypass" || true
-
 echo "==> Composer install"
 $COMPOSER install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
@@ -18,6 +15,9 @@ if command -v npm >/dev/null 2>&1; then
   npm ci --ignore-scripts
   npm run build
 fi
+
+echo "==> Maintenance mode"
+$PHP artisan down --retry=30 --secret="deploy-bypass" || true
 
 echo "==> Permissions"
 chown -R www-data:www-data "$APP_DIR"
