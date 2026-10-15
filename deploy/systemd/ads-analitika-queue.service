@@ -1,0 +1,16 @@
+[Unit]
+Description=Ads Analitika queue worker
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/var/www/ads-analitika
+ExecStart=/usr/bin/php /var/www/ads-analitika/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
