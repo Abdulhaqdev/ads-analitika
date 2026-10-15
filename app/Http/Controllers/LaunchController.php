@@ -17,7 +17,15 @@ class LaunchController extends Controller
     {
         $accounts = FacebookAdAccount::where('is_tracked', true)->orderBy('name');
         $account = $request->filled('a') ? (clone $accounts)->find($request->integer('a')) : null;
-        $account ??= (clone $accounts)->find(session('launch_account')) ?? $accounts->firstOrFail();
+        $account ??= (clone $accounts)->find(session('launch_account')) ?? $accounts->first();
+
+        if (! $account) {
+            return view('launch', [
+                'account' => null,
+                'content' => view('panels.launch-empty')->render(),
+            ]);
+        }
+
         session(['launch_account' => $account->id]);
 
         return view('launch', ['account' => $account, 'content' => $panel->launch($request, $account)->render()]);
